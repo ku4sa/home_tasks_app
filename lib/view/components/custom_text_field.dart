@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:formz/formz.dart';
-import 'package:home_tasks_app/theme/src/colors.dart';
 import 'package:home_tasks_app/theme/src/textstyle.dart';
 
 class CustomTextField extends StatefulWidget {

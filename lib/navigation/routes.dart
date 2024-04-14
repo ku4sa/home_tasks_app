@@ -2,7 +2,7 @@ enum AppRoute {
   home('/homepage'),
   settings('/settings'),
   auth('/auth'),
-  favorites('/plans'),
+  plans('/plans'),
   ;
 
   const AppRoute(this.path);

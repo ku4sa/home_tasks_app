@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
+import 'package:go_router/go_router.dart';
+import 'package:home_tasks_app/navigation/routes.dart';
 import 'package:home_tasks_app/theme/src/colors.dart';
 import 'package:home_tasks_app/view/components/custom_text_field.dart';
 import 'package:home_tasks_app/view/components/text_button.dart';
@@ -62,6 +64,8 @@ class _AuthFormState extends State<AuthForm> {
         if (state.status.isSuccess) {
           ScaffoldMessenger.of(context)
               .showSnackBar(SnackBar(content: Text("УСПЕШНО")));
+
+          context.go(AppRoute.home.path);
           //context.go(AppRoute.home.path);
         } else if (state.status.isFailure) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(

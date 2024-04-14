@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
 import 'package:home_tasks_app/injectable/injectable.dart';
+import 'package:home_tasks_app/navigation/router.dart';
 import 'package:home_tasks_app/repositories/auth_repository.dart';
-import 'package:home_tasks_app/repositories/utils/dio.dart';
-import 'package:home_tasks_app/view/authorization-page/auth_view.dart';
 import "package:path_provider/path_provider.dart" as path;
 
 void main() async {
@@ -25,12 +24,8 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: AuthorizationPage(),
-        ),
-      ),
+    return MaterialApp.router(
+      routerConfig: router,
     );
   }
 }
