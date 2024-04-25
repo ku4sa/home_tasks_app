@@ -15,6 +15,8 @@ final class Name extends FormzInput<String, String> {
       return null;
     } else if (value != null && value.isNotEmpty) {
       return "Может содержать только латинницу, кириллицу и специальные символы";
+    } else {
+      return null;
     }
   }
 }

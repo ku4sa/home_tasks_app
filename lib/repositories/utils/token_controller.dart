@@ -84,6 +84,7 @@ class TokenController {
     var token = await getRefreshToken();
     if (username != null && token != null) {
       tokens = TokenPair(token, "");
+      return username;
     }
     return null;
   }
@@ -91,10 +92,10 @@ class TokenController {
   Future<void> refreshToken(Dio dio) async {
     Response? response;
     if (tokens == null) {
-      throw AuthException(401);
+      throw AppException(401);
     }
     try {
-      response = await dio.post('auth/refresh', data: {
+      response = await dio.post('auth/refresh', queryParameters: {
         'refreshToken': tokens!.refreshToken,
       });
       print('refresh: i asked to change ${tokens?.accessToken}');
@@ -111,7 +112,7 @@ class TokenController {
       print('refresh: i changed ${tokens?.accessToken}');
     } on DioException catch (error) {
       print(error.response!.statusCode!);
-      throw AuthException(
+      throw AppException(
         error.response!.statusCode!,
       );
     }

@@ -30,8 +30,7 @@ class AuthPageBloc extends Bloc<AuthPageEvent, AuthPageState> {
     on<PasswordChanged>(_passwordChanged);
   }
 
-  final AuthorizationUseCase _authorizationUseCase =
-      GetIt.instance.get<AuthorizationUseCase>();
+  late final AuthorizationUseCase _authorizationUseCase;
 
   /* Future<void> _usernameUnfocused(
       UsernameUnfocused event, Emitter<AuthPageState> emit) async {
@@ -147,6 +146,9 @@ class AuthPageBloc extends Bloc<AuthPageEvent, AuthPageState> {
 
   Future<void> _authPageOpened(
       AuthPageOpened event, Emitter<AuthPageState> emit) async {
+        
+    _authorizationUseCase = GetIt.instance<AuthorizationUseCase>();
+    await _authorizationUseCase.init();
     emit(
       state.copyWith(
           status: FormzSubmissionStatus.initial,
@@ -191,7 +193,7 @@ class AuthPageBloc extends Bloc<AuthPageEvent, AuthPageState> {
           emit(
             state.copyWith(
               status: FormzSubmissionStatus.failure,
-              errorMessage: (error is AuthException)
+              errorMessage: (error is AppException)
                   ? error.getMessage()
                   : "Глобальная ошибка",
             ),
@@ -213,7 +215,7 @@ class AuthPageBloc extends Bloc<AuthPageEvent, AuthPageState> {
           emit(
             state.copyWith(
               status: FormzSubmissionStatus.failure,
-              errorMessage: (error is AuthException)
+              errorMessage: (error is AppException)
                   ? error.getMessage()
                   : "Глобальная ошибка",
             ),

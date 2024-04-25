@@ -1,8 +1,7 @@
-
-class AuthException {
+class AppException {
   final int code;
   final String? message;
-  AuthException(this.code, {this.message});
+  AppException(this.code, {this.message});
 
   String getMessage() {
     switch (code) {

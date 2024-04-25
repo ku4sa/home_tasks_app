@@ -7,36 +7,40 @@ import 'package:home_tasks_app/theme/src/textstyle.dart';
 
 class CustomTextField extends StatefulWidget {
   final bool isPassword;
+  final Color? filledColor;
   final bool isSearch;
   final bool obscureText;
   final String label;
   final FocusNode? focusNode;
-  final String initialValue;
-  final FormzInput formzInput;
+  final String? initialValue;
+  final FormzInput? formzInput;
   final int maxLines;
   final String hInt;
   final String? icon;
   final String suffixIcon;
+  final String? text;
   final String? secondSuffixIcon;
-  final Function(String?)? onTapSuffixIcon;
-  final Function(String) onChanged;
+  final void Function(String?)? onTapSuffixIcon;
+  final void Function(String) onChanged;
 
   const CustomTextField({
     super.key,
     this.focusNode,
     this.icon,
     required this.label,
+    this.text,
     this.isPassword = false,
     this.isSearch = false,
     this.obscureText = false,
     this.secondSuffixIcon,
-    this.initialValue = "",
+    this.initialValue,
     required this.formzInput,
     this.maxLines = 1,
     required this.hInt,
-    required this.suffixIcon,
+    this.suffixIcon = 'assets/icons/clear.svg',
     this.onTapSuffixIcon,
     required this.onChanged,
+    this.filledColor,
   });
 
   @override
@@ -51,13 +55,17 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   void validate() {
     setState(() {
-      Formz.validate([widget.formzInput]);
+      if (widget.formzInput != null) {
+        Formz.validate([widget.formzInput!]);
+      }
     });
   }
 
   @override
   void initState() {
-    controller = TextEditingController(text: widget.initialValue);
+    controller = TextEditingController(
+      text: widget.initialValue,
+    );
     controller.addListener(
       () {
         _timer?.cancel();
@@ -86,6 +94,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
+      style: AppTextStyles.bigText.copyWith(height: 1.5),
       focusNode: widget.focusNode,
       maxLines: widget.maxLines,
       obscureText: obscureText,
@@ -102,9 +111,12 @@ class _CustomTextFieldState extends State<CustomTextField> {
         );
       },
       decoration: InputDecoration(
-          errorText: widget.formzInput.error,
+          fillColor: widget.filledColor,
+          filled: widget.filledColor != null,
+          errorText: widget.formzInput?.error,
           errorMaxLines: 3,
           helperMaxLines: 3,
+          hintText: widget.text,
           labelText: widget.label,
           labelStyle: AppTextStyles.smallText,
           prefixIcon: widget.icon != null

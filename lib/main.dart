@@ -8,9 +8,12 @@ import "package:path_provider/path_provider.dart" as path;
 
 void main() async {
   configureDependencies();
+   WidgetsFlutterBinding.ensureInitialized();
   final currentPath = await path.getApplicationSupportDirectory();
   Hive.init(currentPath.path);
+  print('лол');
   await GetIt.instance<AuthorizationRepository>().init();
+ 
   //var auth = AuthorizationRepository(GetIt.instance<MyDio>());
   //await auth.init();
   // await auth.signUp("ku4sa", "12345678", name: "НАстя");

@@ -18,6 +18,7 @@ class NavigationPage extends StatelessWidget {
     return Scaffold(
         body: navigationShell,
         bottomNavigationBar: BottomNavigationBar(
+          
           backgroundColor: AppColors.lightBlue,
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
@@ -25,7 +26,7 @@ class NavigationPage extends StatelessWidget {
                 width: 85, 
                 height: 75,
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 //  clipBehavior: Clip.antiAlias,
                 decoration: (navigationShell.currentIndex == 0)
                     ? ShapeDecoration(

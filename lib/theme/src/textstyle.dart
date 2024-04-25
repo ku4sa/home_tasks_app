@@ -53,7 +53,7 @@ abstract class AppTextStyles {
 
   static TextStyle nameForGroup = const TextStyle(
     color: Colors.white,
-    fontSize: 20,
+    fontSize: 19,
     fontFamily: 'Inter',
     fontWeight: FontWeight.w400,
     height: 0,

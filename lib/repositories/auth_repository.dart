@@ -1,6 +1,7 @@
+// ignore_for_file: invalid_annotation_target
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:get_it/get_it.dart';
 import 'package:home_tasks_app/repositories/utils/dio.dart';
 import 'package:home_tasks_app/repositories/utils/token_controller.dart';
 import 'package:injectable/injectable.dart';
@@ -9,11 +10,13 @@ import 'models/token_pair.dart';
 import 'utils/exception.dart';
 
 //TODO:удалить пользователя, выйти, получить инфу о пользователе
+
 @singleton
+@injectable
 class AuthorizationRepository {
-  late MyDio _dio;
-  late TokenController tokenController;
-  final ValueNotifier<User?> activeUser = ValueNotifier(null);
+  late final MyDio _dio;
+  late final TokenController tokenController;
+  ValueNotifier<User?> activeUser = ValueNotifier(null);
 
   AuthorizationRepository(
     @injectable this._dio,
@@ -21,16 +24,14 @@ class AuthorizationRepository {
   );
 
   bool isUserAuthorized() {
+    print(activeUser.value?.username);
     return activeUser.value != null;
   }
 
   Future<void> init() async {
-    _dio = GetIt.instance<MyDio>();
-
-    tokenController = GetIt.instance<TokenController>();
     try {
-      await _dio.init(tokenController);
       await tokenController.init();
+      await _dio.init(tokenController);
 
       var lastUser = await tokenController.canFastLogin();
       if (lastUser != null) {
@@ -53,10 +54,10 @@ class AuthorizationRepository {
       });
       if (response.statusCode != 200) {
         var result = response.data as String;
-        throw AuthException(response.statusCode!, message: result);
+        throw AppException(response.statusCode!, message: result);
       }
     } on DioException catch (error) {
-      throw AuthException(error.response!.statusCode!,
+      throw AppException(error.response!.statusCode!,
           message: error.response!.data as String);
     }
   }
@@ -74,7 +75,7 @@ class AuthorizationRepository {
       //print(response);
       if (response.statusCode != 200) {
         var result = response.data as String;
-        throw AuthException(response.statusCode!, message: result);
+        throw AppException(response.statusCode!, message: result);
       } else {
         Map<String, dynamic> data = response.data;
         if (tokenController.tokens == null) {
@@ -83,14 +84,17 @@ class AuthorizationRepository {
         } else {
           tokenController.tokens!.accessToken = data['accessToken'];
           tokenController.tokens!.refreshToken = data['refreshToken'];
-          tokenController.storeRefreshToken(username);
         }
         _dio.dio.options.headers['authorization'] =
             'Bearer ${tokenController.tokens!.accessToken}';
         print(tokenController.tokens!.accessToken);
+        activeUser = ValueNotifier(
+          User(username: username, name: "", password: password),
+        );
+        await tokenController.storeRefreshToken(username);
       }
     } on DioException catch (error) {
-      throw AuthException(error.response!.statusCode!,
+      throw AppException(error.response!.statusCode!,
           message: error.response!.data as String);
     } catch (error) {
       print(error);
@@ -105,7 +109,7 @@ class AuthorizationRepository {
         activeUser.value = User(username: lastUser, password: "", name: "");
         return activeUser.value!.name;
       } catch (error) {
-        if (error is AuthException) {
+        if (error is AppException) {
           return null;
         }
       }
@@ -116,13 +120,15 @@ class AuthorizationRepository {
 
   Future<void> logOut() async {
     if (tokenController.tokens == null) {
-      throw AuthException(401); //Человек не зашёл)
+      throw AppException(401); //Человек не зашёл)
     }
     try {
       await _dio.dio.delete('auth/logOut');
       tokenController.tokens = null;
+      tokenController.clearRefreshToken();
+      activeUser.value = null;
     } on DioException catch (error) {
-      throw AuthException(
+      throw AppException(
         error.response!.statusCode!,
         message: error.response?.data is String
             ? error.response?.data as String
@@ -131,8 +137,6 @@ class AuthorizationRepository {
     }
   }
 
-
-  
 /*
   Future<void> deleteUser() async {
     try {

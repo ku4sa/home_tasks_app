@@ -3,10 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_tasks_app/navigation/routes.dart';
-import 'package:home_tasks_app/theme/src/colors.dart';
 import 'package:home_tasks_app/view/components/custom_text_field.dart';
 import 'package:home_tasks_app/view/components/text_button.dart';
-
+import '../../theme/theme.dart';
 import 'auth_bloc.dart';
 import 'auth_event.dart';
 import 'auth_state.dart';
