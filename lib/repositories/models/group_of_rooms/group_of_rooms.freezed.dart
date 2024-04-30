@@ -176,15 +176,16 @@ class __$$GroupOfRoomsImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$GroupOfRoomsImpl implements _GroupOfRooms {
-  const _$GroupOfRoomsImpl(
+class _$GroupOfRoomsImpl extends _GroupOfRooms {
+  _$GroupOfRoomsImpl(
       {required this.id,
       required this.author,
       required this.describtion,
       required this.name,
       required this.dateUpdate,
       required this.users,
-      required this.rooms});
+      required this.rooms})
+      : super._();
 
   factory _$GroupOfRoomsImpl.fromJson(Map<String, dynamic> json) =>
       _$$GroupOfRoomsImplFromJson(json);
@@ -251,8 +252,8 @@ class _$GroupOfRoomsImpl implements _GroupOfRooms {
   }
 }
 
-abstract class _GroupOfRooms implements GroupOfRooms {
-  const factory _GroupOfRooms(
+abstract class _GroupOfRooms extends GroupOfRooms {
+  factory _GroupOfRooms(
       {required final String? id,
       required final String author,
       required final String? describtion,
@@ -260,6 +261,7 @@ abstract class _GroupOfRooms implements GroupOfRooms {
       required final DateTime dateUpdate,
       required final List<String> users,
       required final List<String> rooms}) = _$GroupOfRoomsImpl;
+  _GroupOfRooms._() : super._();
 
   factory _GroupOfRooms.fromJson(Map<String, dynamic> json) =
       _$GroupOfRoomsImpl.fromJson;

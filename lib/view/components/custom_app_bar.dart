@@ -12,13 +12,13 @@ class MyAppBar extends StatelessWidget {
     this.valuesOfSearchBar,
     this.haveButtons = false,
     required this.title,
-    this.haveAddButton = false,
+    this.righttExitWithSave = false,
     this.onExit,
     this.style,
     this.underTitle,
     this.onExitWithSave,
   });
-  final bool haveAddButton;
+  final bool righttExitWithSave;
   final bool canGoBack;
   final TextStyle? style;
   final bool haveButtons;
@@ -87,21 +87,26 @@ class MyAppBar extends StatelessWidget {
               ],
             ),
           ),
-          if (haveAddButton)
-            Expanded(
-              flex: 1,
-              child: Container(
-                color: AppColors.green,
-                child: IconButton(
-                  onPressed: onExitWithSave,
-                  icon: Icon(
-                    Icons.check,
-                    color: AppColors.white,
-                  ),
-                ),
-              ),
-            )
+          if (righttExitWithSave) _exitWithSave(),
         ],
+      ),
+    );
+  }
+
+  Widget _exitWithSave() {
+    return Expanded(
+      flex: 1,
+      child: IconButton(
+        style: IconButton.styleFrom(
+            disabledBackgroundColor: AppColors.disabled,
+            backgroundColor: AppColors.green,
+            hoverColor: AppColors.white.withOpacity(0.2),
+            shape: const BeveledRectangleBorder()),
+        onPressed: onExitWithSave,
+        icon: Icon(
+          Icons.check,
+          color: AppColors.white,
+        ),
       ),
     );
   }

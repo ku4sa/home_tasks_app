@@ -5,7 +5,6 @@ import 'package:get_it/get_it.dart';
 import 'package:home_tasks_app/repositories/models/group_of_rooms/group_of_rooms.dart';
 import 'package:home_tasks_app/repositories/utils/exception.dart';
 import 'package:home_tasks_app/use_cases/group_use_case.dart';
-import 'package:home_tasks_app/view/group_page/group_page_events.dart';
 import 'package:home_tasks_app/view/groupes_page/groupes_page_events.dart';
 import 'package:home_tasks_app/view/groupes_page/groupes_page_state.dart';
 
@@ -63,7 +62,9 @@ class GroupPageBloc extends Bloc<GroupPageEvent, GroupPageState> {
       groupes = ValueNotifier(
         groupes.value
           ..add(
-            event.group.copyWith(id: id),
+            event.group.copyWith(
+              id: id,
+            ),
           ),
       );
 
@@ -149,7 +150,7 @@ class GroupPageBloc extends Bloc<GroupPageEvent, GroupPageState> {
   Future<void> _onDeleteGroup(
       DeleteGroup event, Emitter<GroupPageState> emit) async {
     try {
-      final id = await groupUseCase.deleteGroup(
+      await groupUseCase.deleteGroup(
         groupId: event.group.id!,
       );
       groupes = ValueNotifier(

@@ -30,42 +30,44 @@ class GroupSelecter extends StatelessWidget {
           haveButtons: false,
         ),
       ),
-      body: FutureBuilder(
-        future: _getGroupes(),
-        initialData: const [],
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
-          }
-          if (snapshot.connectionState == ConnectionState.done) {
-            return snapshot.hasData
-                ? ListView.builder(
-                    padding: const EdgeInsets.all(8),
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index) {
-                      final item =
-                          snapshot.data!.elementAt(index) as GroupOfRooms;
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).pop(item);
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: GroupOfRoomsAndRoomsView(
-                            isRoom: false,
-                            data: item,
-                            haveSettings: false,
+      body: Center(
+        child: FutureBuilder(
+          future: _getGroupes(),
+          initialData: const [],
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            }
+            if (snapshot.connectionState == ConnectionState.done) {
+              return snapshot.hasData
+                  ? ListView.builder(
+                      padding: const EdgeInsets.all(8),
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        final item =
+                            snapshot.data!.elementAt(index) as GroupOfRooms;
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).pop(item);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            child: GroupOfRoomsAndRoomsView(
+                              isRoom: false,
+                              data: item,
+                              haveSettings: false,
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  )
-                : const Text('Нечего импортировать');
-          }
-          else{
-            return Text('Нечего импортировать');
-          }
-        },
+                        );
+                      },
+                    )
+                  : const Text('Нечего импортировать');
+            }
+            else{
+              return Text('Нечего импортировать');
+            }
+          },
+        ),
       ),
     );
   }

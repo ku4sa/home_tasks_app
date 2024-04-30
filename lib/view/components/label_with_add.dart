@@ -32,10 +32,11 @@ class LabelWithAdd extends StatelessWidget {
               style: AppTextStyles.nameForGroup,
             ),
           ),
-          IconButton(
-            onPressed: onAdd,
-            icon: SvgPicture.asset('assets/icons/add_round.svg'),
-          ),
+          if (onAdd != null)
+            IconButton(
+              onPressed: onAdd,
+              icon: SvgPicture.asset('assets/icons/add_round.svg'),
+            ),
         ],
       ),
     );

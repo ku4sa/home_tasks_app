@@ -46,12 +46,13 @@ class RoomPageBloc extends Bloc<RoomPageEvent, RoomPageState> {
       final list = await roomUseCase.getRoom(groupes.first.id!);
       print("ok");
       rooms = ValueNotifier(list!);
+      await groupUseCase.selectGroup(groupes.first);
 
       emit(
         state.copyWith(
           inProcces: false,
           groupes: groupes,
-          selectedGroup: groupes.first,
+          selectedGroup: groupUseCase.getActiveGroup(),
           rooms: rooms.value,
         ),
       );
@@ -94,16 +95,48 @@ class RoomPageBloc extends Bloc<RoomPageEvent, RoomPageState> {
     }
   }
 
-  Future<void> _onEdit(EditRoom event, Emitter<RoomPageState> emit) async {}
+  Future<void> _onEdit(EditRoom event, Emitter<RoomPageState> emit) async {
+    try {
+      await roomUseCase.editRoom(
+        roomId: event.room.id!,
+        name: event.room.name,
+        describtion: event.room.describtion,
+      );
+      final index = rooms.value.indexWhere(
+        (element) => element.id == event.room.id,
+      );
+
+      final list = rooms.value;
+      list.removeAt(index);
+      list.insert(
+        index,
+        event.room,
+      );
+
+      rooms.value = list;
+      emit(
+        state.copyWith(inProcces: false, rooms: rooms.value),
+      );
+      //changeData.value = true;
+    } catch (error) {
+      emit(
+        state.copyWith(
+          inProcces: false,
+          message:
+              error is AppException ? error.getMessage() : error.toString(),
+        ),
+      );
+    }
+  }
 
   Future<void> _onSwap(SwapGroup event, Emitter<RoomPageState> emit) async {
     try {
       rooms = ValueNotifier((await roomUseCase.getRoom(event.group.id!)) ?? []);
-
+      await groupUseCase.selectGroup(event.group);
       emit(
         state.copyWith(
           inProcces: false,
-          selectedGroup: event.group,
+          selectedGroup: groupUseCase.getActiveGroup(),
           rooms: rooms.value,
         ),
       );
@@ -118,7 +151,29 @@ class RoomPageBloc extends Bloc<RoomPageEvent, RoomPageState> {
     }
   }
 
-  Future<void> _onDelete(DeleteRoom event, Emitter<RoomPageState> emit) async {}
+  Future<void> _onDelete(DeleteRoom event, Emitter<RoomPageState> emit) async {
+    try {
+      await roomUseCase.deleteRoom(
+        roomId: event.room.id!,
+      );
+      rooms = ValueNotifier(
+        rooms.value
+          ..remove(
+            event.room,
+          ),
+      );
+
+      //changeData.value = true;
+    } catch (error) {
+      emit(
+        state.copyWith(
+          inProcces: false,
+          message:
+              error is AppException ? error.getMessage() : error.toString(),
+        ),
+      );
+    }
+  }
 
   Future<void> _onUpdatePage(
       UpdatePage event, Emitter<RoomPageState> emit) async {

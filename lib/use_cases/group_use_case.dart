@@ -4,6 +4,8 @@ import 'package:home_tasks_app/repositories/group_repository.dart';
 import 'package:home_tasks_app/repositories/models/group_of_rooms/group_of_rooms.dart';
 import 'package:injectable/injectable.dart';
 
+import '../repositories/models/user/user.dart';
+
 //TODO: добавить базу данных где хранить только свои группы комнат и задачи
 
 @injectable
@@ -13,8 +15,29 @@ class GroupUseCase {
   );
   late final GroupRepository _groupRepository;
 
+  GroupOfRooms? getActiveGroup() {
+    return _groupRepository.activeGroupOfRooms.value;
+  }
+
+  List<User>? getUsers() {
+    final list = getActiveGroup()?.users;
+    if (list != null && list.isNotEmpty) {
+      return List<User>.generate(list.length, (index) {
+        return User(
+          username: list[index],
+        );
+      });
+    } else {
+      return null;
+    }
+  }
+
   Future<void> init() async {
     await _groupRepository.init();
+  }
+
+  Future<void> selectGroup(GroupOfRooms group) async {
+    await _groupRepository.selectGroup(group);
   }
 
   Future<List<GroupOfRooms>?> getGroup() async {

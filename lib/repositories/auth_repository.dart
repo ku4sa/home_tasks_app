@@ -2,10 +2,10 @@
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:home_tasks_app/repositories/models/user/user.dart';
 import 'package:home_tasks_app/repositories/utils/dio.dart';
 import 'package:home_tasks_app/repositories/utils/token_controller.dart';
 import 'package:injectable/injectable.dart';
-import 'models/User.dart';
 import 'models/token_pair.dart';
 import 'utils/exception.dart';
 
@@ -93,11 +93,15 @@ class AuthorizationRepository {
         );
         await tokenController.storeRefreshToken(username);
       }
-    } on DioException catch (error) {
-      throw AppException(error.response!.statusCode!,
-          message: error.response!.data as String);
-    } catch (error) {
+    /*on DioException catch (error) {
       print(error);
+      throw AppException(error.response!.statusCode!,
+          message: error.response!.data as String);*/
+    } catch (error, st) {
+
+
+      print(error);
+      print(st);
     }
   }
 

@@ -1,19 +1,38 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:home_tasks_app/repositories/auth_repository.dart';
 import 'package:home_tasks_app/repositories/models/group_of_rooms/group_of_rooms.dart';
 import 'package:home_tasks_app/repositories/utils/dio.dart';
 import 'package:injectable/injectable.dart';
-import 'models/User.dart';
+import 'models/user/user.dart';
 import 'utils/exception.dart';
 
 @singleton
 class GroupRepository {
   late MyDio _dio;
   late User? _user;
+  final ValueNotifier<GroupOfRooms?> activeGroupOfRooms = ValueNotifier(null);
 
   GroupRepository() {
     _dio = GetIt.instance<MyDio>();
+  }
+
+  Future<void> selectGroup(GroupOfRooms group) async {
+    activeGroupOfRooms.value = group;
+  }
+
+  List<User>? getUsers() {
+    final list = activeGroupOfRooms.value?.users;
+    if (list != null && list.isNotEmpty) {
+      return List<User>.generate(list.length, (index) {
+        return User(
+          username: list[index],
+        );
+      });
+    } else {
+      return null;
+    }
   }
 
   Future<void> init() async {

@@ -90,9 +90,12 @@ class GroupesPage extends StatelessWidget {
                               child: GroupOfRoomsAndRoomsView(
                                 isRoom: false,
                                 data: item,
-                                onTapSettings: () async {
+                                onTapSettings: (editingMode) async {
                                   final result = await context
-                                      .push(AppRoute.group.path, extra: item);
+                                      .push(AppRoute.group.path, extra: [
+                                    item,
+                                    editingMode,
+                                  ]);
 
                                   if (result is GroupOfRooms) {
                                     bloc.add(EditGroup(group: result));
@@ -107,9 +110,10 @@ class GroupesPage extends StatelessWidget {
         ),
         floatingActionButton: MyFloatingActionButton(
           onPressed: () async {
-            final result = await context.push(
-              AppRoute.group.path,
-            );
+            final result = await context.push(AppRoute.group.path, extra: [
+              null,
+              true,
+            ]);
             if (result is GroupOfRooms) {
               bloc.add(AddGroup(group: result));
             }

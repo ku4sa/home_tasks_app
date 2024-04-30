@@ -4,7 +4,7 @@ import 'package:home_tasks_app/repositories/auth_repository.dart';
 import 'package:home_tasks_app/repositories/models/room/room.dart';
 import 'package:home_tasks_app/repositories/utils/dio.dart';
 import 'package:injectable/injectable.dart';
-import 'models/User.dart';
+import 'models/user/user.dart';
 import 'utils/exception.dart';
 
 @singleton
@@ -29,13 +29,13 @@ class RoomRepository {
       );
       if (response.statusCode == 200) {
         List<Room> rooms = [];
-        print("test");
+
         (response.data as List<dynamic>).forEach(
           (element) {
             rooms.add(Room.fromJson(element));
           },
         );
-        print("test");
+
         return rooms;
       } else {
         var result = response.data as String;
@@ -57,7 +57,7 @@ class RoomRepository {
     Response? response;
     try {
       response = await _dio.dio.put(
-        'groupes/${_user!.username}',
+        'rooms',
         queryParameters: {
           "id": roomId,
           "name": name,
@@ -88,7 +88,7 @@ class RoomRepository {
     Response? response;
     try {
       response = await _dio.dio.delete(
-        'groupes/${_user!.username}',
+        'rooms',
         queryParameters: {
           "groupId": roomId, //TODO:поправить в серверной части
         },

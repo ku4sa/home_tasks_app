@@ -1,7 +1,8 @@
 import "package:flutter/material.dart";
+import "package:get_it/get_it.dart";
+import "package:home_tasks_app/repositories/auth_repository.dart";
 import "package:home_tasks_app/repositories/models/data_model.dart";
 import "package:home_tasks_app/repositories/models/group_of_rooms/group_of_rooms.dart";
-import "package:home_tasks_app/repositories/models/room/room.dart";
 
 import "../../theme/src/colors.dart";
 import "../../theme/src/textstyle.dart";
@@ -16,18 +17,24 @@ class GroupOfRoomsAndRoomsView extends StatelessWidget {
   });
   final bool haveSettings;
 
-  final void Function()? onTapSettings;
+  final void Function(bool fullEditting)? onTapSettings;
   final bool isRoom;
   final DataModel data;
 
   @override
   Widget build(BuildContext context) {
-    final name = (data is GroupOfRooms)
-        ? (data as GroupOfRooms).name
-        : (data as Room).name;
-    final count = (data is GroupOfRooms)
-        ? (data as GroupOfRooms).rooms.length
-        : (data as Room).tasks.length;
+    final isPublicGroup = (data is GroupOfRooms)
+        ? ((data as GroupOfRooms).author !=
+                GetIt.instance<AuthorizationRepository>()
+                    .activeUser
+                    .value
+                    ?.username
+            ? true
+            : false)
+        : null;
+    final name = data.getName();
+    final count = data.getCount();
+
     return Container(
       height: 60,
       decoration: BoxDecoration(
@@ -38,9 +45,21 @@ class GroupOfRoomsAndRoomsView extends StatelessWidget {
         padding: const EdgeInsets.only(left: 10),
         child: Row(
           mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            (isPublicGroup != null && isPublicGroup == true)
+                ? Expanded(
+                    child: Center(
+                      child: Icon(
+                        Icons.public,
+                        color: AppColors.disabled,
+                      ),
+                    ),
+                  )
+                : const SizedBox(
+                    width: 20,
+                  ),
             Expanded(
               flex: 3,
               child: Text(
@@ -48,7 +67,6 @@ class GroupOfRoomsAndRoomsView extends StatelessWidget {
                 style: AppTextStyles.bigText,
               ),
             ),
-            const Spacer(),
             Expanded(
               flex: 2,
               child: Text(
@@ -58,7 +76,9 @@ class GroupOfRoomsAndRoomsView extends StatelessWidget {
             ),
             if (haveSettings)
               IconButton(
-                onPressed: onTapSettings,
+                onPressed: () {
+                  onTapSettings!(isPublicGroup != null ? !isPublicGroup : true);
+                },
                 icon: const Icon(Icons.settings),
               )
           ],

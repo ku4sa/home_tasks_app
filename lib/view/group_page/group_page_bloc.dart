@@ -1,14 +1,12 @@
 import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:formz/formz.dart';
 import 'package:get_it/get_it.dart';
+import 'package:home_tasks_app/repositories/auth_repository.dart';
 import 'package:home_tasks_app/repositories/models/group_of_rooms/group_of_rooms.dart';
 import 'package:home_tasks_app/repositories/utils/exception.dart';
+import 'package:home_tasks_app/repositories/utils/validator.dart';
 import 'package:home_tasks_app/use_cases/group_use_case.dart';
-import 'package:home_tasks_app/view/authorization_page/models/describtion.dart';
-
-import '../authorization_page/models/models.dart';
 import 'group_page_events.dart';
 import 'group_page_state.dart';
 
@@ -16,10 +14,7 @@ class GroupEditorPageBloc
     extends Bloc<GroupEditorPageEvent, GroupEditorPageState> {
   GroupEditorPageBloc()
       : super(
-          GroupEditorPageState(
-            name: Name.pure(),
-            describtion: Describtion.pure(),
-          ),
+          GroupEditorPageState(),
         ) {
     on<AddUser>(_onAddUser);
 
@@ -34,8 +29,6 @@ class GroupEditorPageBloc
   late GroupUseCase groupUseCase;
   late ValueNotifier<List<GroupOfRooms>> groupes;
   final ValueNotifier<bool> changeData = ValueNotifier(false);
-
-
 
   Future<void> _onAddUser(
       AddUser event, Emitter<GroupEditorPageState> emit) async {
@@ -85,9 +78,10 @@ class GroupEditorPageBloc
       ChangeName event, Emitter<GroupEditorPageState> emit) async {
     emit(
       state.copyWith(
-        name: Name.pure(event.name),
+        //name: Name.pure(event.name),
         group: state.group!.copyWith(name: event.name),
-        isValid: Formz.validate([Name.dirty(event.name), state.describtion]),
+        isValid: Validator.validateName(event.name) == null &&
+            Validator.validateDescription(state.group!.describtion) == null,
       ),
     );
   }
@@ -96,12 +90,10 @@ class GroupEditorPageBloc
       ChangeDescribtion event, Emitter<GroupEditorPageState> emit) async {
     emit(
       state.copyWith(
-        describtion: Describtion.pure(event.describtion),
+        // describtion: Describtion.pure(event.describtion),
         group: state.group!.copyWith(describtion: event.describtion),
-        isValid: Formz.validate([
-          state.name,
-          Describtion.pure(event.describtion),
-        ]),
+        isValid: Validator.validateName(state.group!.name) == null &&
+            Validator.validateDescription(event.describtion) == null,
       ),
     );
   }
@@ -111,10 +103,11 @@ class GroupEditorPageBloc
     emit(
       state.copyWith(
         group: event.group,
-        name: Name.pure(
+        /*  name: Name.pure(
           event.group.name,
         ),
-        describtion: Describtion.pure(event.group.describtion ?? ""),
+        describtion: Describtion.pure(event.group.describtion ?? ""),*/
+        isValid: true,
       ),
     );
     groupUseCase = GetIt.instance<GroupUseCase>();
@@ -124,7 +117,8 @@ class GroupEditorPageBloc
       CreatorOpened event, Emitter<GroupEditorPageState> emit) {
     final group = GroupOfRooms(
       id: "",
-      author: "",
+      author:
+          GetIt.instance<AuthorizationRepository>().activeUser.value!.username,
       describtion: "",
       name: "",
       dateUpdate: DateTime.now(),
@@ -135,10 +129,11 @@ class GroupEditorPageBloc
     emit(
       state.copyWith(
         group: group,
-        name: Name.pure(group.name),
+        /*name: Name.pure(group.name),
         describtion: Describtion.pure(
           group.describtion ?? "",
-        ),
+        ),*/
+        isValid: false,
       ),
     );
   }
@@ -156,11 +151,12 @@ class GroupEditorPageBloc
     );
     emit(
       state.copyWith(
-        name: Name.pure(group.name),
+        /*  name: Name.pure(group.name),
         describtion: Describtion.pure(
           group.describtion ?? "",
-        ),
+        ),*/
         group: group,
+        isValid: true,
       ),
     );
   }

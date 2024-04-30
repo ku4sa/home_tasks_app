@@ -25,6 +25,7 @@ class AuthorizationUseCase {
         print(error.message);
         rethrow;
       }
+      rethrow;
     }
   }
 
@@ -36,6 +37,7 @@ class AuthorizationUseCase {
         print(error.message);
         rethrow;
       }
+      rethrow;
     }
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:home_tasks_app/navigation/routes.dart';
+import 'package:home_tasks_app/repositories/models/group_of_rooms/group_of_rooms.dart';
 import 'package:home_tasks_app/view/home_page/home_page_bloc.dart';
 import 'package:home_tasks_app/view/home_page/home_page_events.dart';
 import '../../repositories/models/room/room.dart';
@@ -27,10 +28,14 @@ class HomePage extends StatelessWidget {
               haveButtons: true,
               underTitle: MyDropDownButton(
                 onChanged: (p0) {
-                  bloc.add(SwapGroup(group: p0));
+                  if (p0 is GroupOfRooms) {
+                    bloc.add(
+                      SwapGroup(group: p0),
+                    );
+                  }
                 },
-                selectedGroupOfRoom: state.selectedGroup,
-                groupes: state.groupes,
+                selectedValue: state.selectedGroup,
+                content: state.groupes,
               ),
               onTapSettings: () async {
                 final result = await context.push(
@@ -58,13 +63,14 @@ class HomePage extends StatelessWidget {
           BlocBuilder<RoomPageBloc, RoomPageState>(
             builder: (context, state) => state.inProcces
                 ? const SliverToBoxAdapter(
-                    child: Expanded(child: Center(child: CircularProgressIndicator())))
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
                 : state.rooms.isEmpty
                     ? const SliverToBoxAdapter(
-                        child: Expanded(
-                          child: Center(
-                            child: Text('Пусто'),
-                          ),
+                        child: Center(
+                          child: Text('Пусто'),
                         ),
                       )
                     : SliverList.builder(
@@ -93,8 +99,27 @@ class HomePage extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              child: GroupOfRoomsAndRoomsView(
-                                data: item,
+                              child: GestureDetector(
+                                onTap: () async {
+                                  final result = await context.push(
+                                    AppRoute.tasks.path,
+                                    extra: item,
+                                  );
+                                },
+                                child: GroupOfRoomsAndRoomsView(
+                                  data: item,
+                                  onTapSettings: (fullEditting) async {
+                                    final result = await context.push(
+                                      AppRoute.room.path,
+                                      extra: item,
+                                    );
+                                    if (result is Room) {
+                                      bloc.add(
+                                        EditRoom(room: result),
+                                      );
+                                    }
+                                  },
+                                ),
                               ),
                             ),
                           );
@@ -103,17 +128,17 @@ class HomePage extends StatelessWidget {
           ),
         ]),
         floatingActionButton: MyFloatingActionButton(
-          onPressed: () => bloc.add(
-            AddRoom(
-              room: Room(
-                id: "",
-                name: "room",
-                describtion: "апа",
-                dateUpdate: DateTime.now(),
-                tasks: [],
-              ),
-            ),
-          ),
+          onPressed: () async {
+            final result = await context.push(
+              AppRoute.room.path,
+              extra: null,
+            );
+            if (result is Room) {
+              bloc.add(
+                AddRoom(room: result),
+              );
+            }
+          },
         ),
       ),
     );

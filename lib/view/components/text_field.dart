@@ -2,16 +2,20 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:home_tasks_app/theme/src/colors.dart';
 import 'package:home_tasks_app/theme/src/textstyle.dart';
 
 class MyCustomTextField extends StatefulWidget {
+  final bool readOnly;
   final bool isPassword;
   final Color? filledColor;
   final bool isSearch;
   final bool obscureText;
-  final String label;
+  final TextEditingController controller;
+  final String? label;
   final String? initialValue;
   final int maxLines;
+  final TextAlign textAlign;
   final String hInt;
   final String? icon;
   final String suffixIcon;
@@ -23,8 +27,11 @@ class MyCustomTextField extends StatefulWidget {
 
   const MyCustomTextField({
     super.key,
+    this.textAlign = TextAlign.start,
     this.icon,
-    required this.label,
+    this.readOnly = true,
+    required this.controller,
+    this.label,
     this.text,
     this.isPassword = false,
     this.isSearch = false,
@@ -54,19 +61,18 @@ class _MyCustomTextFieldState extends State<MyCustomTextField> {
   void validate() {
     if (widget.validator != null) {
       setState(() {
-        error = widget.validator!(value);
+        error = widget.validator!(widget.controller.text);
       });
     }
   }
 
   void changeValue(String v) {
-    value = v;
     validate();
     _timer?.cancel();
     _timer = Timer.periodic(
       const Duration(milliseconds: 500),
       (timer) {
-        widget.onChanged(value);
+        widget.onChanged(widget.controller.text);
         _timer?.cancel();
       },
     );
@@ -74,15 +80,6 @@ class _MyCustomTextFieldState extends State<MyCustomTextField> {
 
   @override
   void initState() {
-    _timer?.cancel();
-    _timer = Timer.periodic(
-      const Duration(milliseconds: 500),
-      (timer) {
-        widget.onChanged(value);
-        _timer?.cancel();
-      },
-    );
-
     obscureText = widget.obscureText;
     super.initState();
   }
@@ -97,13 +94,15 @@ class _MyCustomTextFieldState extends State<MyCustomTextField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      readOnly: widget.readOnly,
+      controller: widget.controller,
       style: AppTextStyles.bigText.copyWith(height: 1.5),
       maxLines: widget.maxLines,
+      textAlign: widget.textAlign,
       obscureText: obscureText,
       onChanged: (value) {
         changeValue(value);
       },
-      initialValue: value,
       decoration: InputDecoration(
         fillColor: widget.filledColor,
         filled: widget.filledColor != null,
@@ -126,7 +125,10 @@ class _MyCustomTextFieldState extends State<MyCustomTextField> {
                 ),
               )
             : null,
-        border: const OutlineInputBorder(),
+        errorBorder: border(AppColors.red, 1.5),
+        focusedBorder: border(AppColors.darkBlue, 2),
+        enabledBorder: border(AppColors.lightBlue, 1.5),
+        focusedErrorBorder: border(AppColors.red, 2),
         suffixIcon: widget.isPassword || value.isNotEmpty
             ? IconButton(
                 isSelected: obscureText,
@@ -143,7 +145,7 @@ class _MyCustomTextFieldState extends State<MyCustomTextField> {
                     });
                   } else {
                     setState(() {
-                      value = "";
+                      widget.controller.clear();
                       _timer?.cancel();
                     });
                   }
@@ -156,6 +158,21 @@ class _MyCustomTextFieldState extends State<MyCustomTextField> {
                     : "Отчистить",
               )
             : null,
+      ),
+    );
+  }
+
+  OutlineInputBorder border(
+    Color color,
+    double width,
+  ) {
+    return OutlineInputBorder(
+      borderRadius: const BorderRadius.all(Radius.circular(
+        5,
+      )),
+      borderSide: BorderSide(
+        color: color,
+        width: width,
       ),
     );
   }

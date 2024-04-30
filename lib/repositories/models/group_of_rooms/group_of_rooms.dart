@@ -6,7 +6,8 @@ part 'group_of_rooms.g.dart';
 
 @Freezed(makeCollectionsUnmodifiable: false)
 class GroupOfRooms extends DataModel with _$GroupOfRooms {
-  const factory GroupOfRooms({
+  GroupOfRooms._();
+  factory GroupOfRooms({
     required String? id,
     required String author,
     required String? describtion,
@@ -18,4 +19,19 @@ class GroupOfRooms extends DataModel with _$GroupOfRooms {
 
   factory GroupOfRooms.fromJson(Map<String, dynamic> json) =>
       _$GroupOfRoomsFromJson(json);
+
+  @override
+  String getName() {
+    return name;
+  }
+
+  @override
+  int? getCount() {
+    return rooms.length;
+  }
+
+  @override
+  String? getDescribtion() {
+    return describtion;
+  }
 }

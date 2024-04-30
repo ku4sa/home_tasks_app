@@ -1,17 +1,21 @@
 import "package:flutter/material.dart";
 import "package:flutter_svg/flutter_svg.dart";
-import "package:home_tasks_app/repositories/models/group_of_rooms/group_of_rooms.dart";
+import "package:home_tasks_app/repositories/models/data_model.dart";
 import "package:home_tasks_app/theme/src/colors.dart";
 import "package:home_tasks_app/theme/src/textstyle.dart";
 
 class MyDropDownButton extends StatefulWidget {
-  final GroupOfRooms? selectedGroupOfRoom;
-  final List<GroupOfRooms> groupes;
-  final void Function(GroupOfRooms) onChanged;
+  final DataModel? selectedValue;
+  final bool setDefault;
+  final bool haveBorder;
+  final List<DataModel> content;
+  final void Function(DataModel) onChanged;
   const MyDropDownButton({
     super.key,
-    required this.groupes,
-    this.selectedGroupOfRoom,
+    this.haveBorder = false,
+    required this.content,
+    this.setDefault = false,
+    this.selectedValue,
     required this.onChanged,
   });
 
@@ -20,26 +24,38 @@ class MyDropDownButton extends StatefulWidget {
 }
 
 class _MyDropDownButtonState extends State<MyDropDownButton> {
-  GroupOfRooms? _selectedItem;
+  DataModel? _selectedItem;
+
+  @override
+  void initState() {
+    _selectedItem = widget.selectedValue;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
           color: AppColors.white,
+          borderRadius: BorderRadius.circular(5),
           border: Border.all(
-            color: AppColors.darkWhite,
+            color:
+                !widget.haveBorder ? AppColors.darkWhite : AppColors.lightBlue,
             width: 2,
           )),
-      child: DropdownButton<GroupOfRooms>(
+      child: DropdownButton<DataModel>(
         alignment: Alignment.bottomCenter,
-        value: _selectedItem ?? widget.selectedGroupOfRoom,
+        value:
+            _selectedItem ?? (widget.setDefault ? widget.content.first : null),
         underline: const SizedBox(),
-        selectedItemBuilder: (context) => widget.groupes.map(
-          (GroupOfRooms item) {
-            return DropdownMenuItem<GroupOfRooms>(
+        selectedItemBuilder: (context) => widget.content.map(
+          (DataModel item) {
+            return DropdownMenuItem<DataModel>(
               value: item,
-              child: Text(item.name, style: AppTextStyles.headerName),
+              child: Text(
+                item.getName(),
+                style: AppTextStyles.headerName,
+              ),
             );
           },
         ).toList(),
@@ -50,13 +66,13 @@ class _MyDropDownButtonState extends State<MyDropDownButton> {
         padding: const EdgeInsets.symmetric(horizontal: 10),
         style: AppTextStyles.headerName,
         borderRadius: const BorderRadius.all(Radius.circular(5)),
-        items: widget.groupes.map(
-          (GroupOfRooms item) {
-            return DropdownMenuItem<GroupOfRooms>(
+        items: widget.content.map(
+          (DataModel item) {
+            return DropdownMenuItem<DataModel>(
               value: item,
               alignment: Alignment.centerLeft,
               child: Text(
-                item.name,
+                item.getName(),
                 style: AppTextStyles.baseText.copyWith(
                   fontSize: 15,
                   color: _selectedItem == item

@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:home_tasks_app/repositories/utils/token_controller.dart';
 import 'package:injectable/injectable.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
@@ -8,13 +11,21 @@ class MyDio {
   late Dio dio;
   Future<void> init(TokenController tokenController) async {
     dio = Dio();
+
+    (dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () =>
+        HttpClient()
+          ..badCertificateCallback =
+              (X509Certificate cert, String host, int port) => true;
+
+              
     dio.options.connectTimeout =
         const Duration(seconds: 5); //таймаут на отправление
     dio.options.receiveTimeout =
         const Duration(seconds: 5); //таймаут на получение
-    dio.options.baseUrl = "https://localhost:7119/api/";
-    dio.interceptors
-        .add(PrettyDioLogger()); //дефолтый адрес(писать один раз!!!)
+    dio.options.baseUrl = "https://192.168.10.102:7119/api/";
+    dio.interceptors.add(PrettyDioLogger(
+      requestBody: true,
+    )); //дефолтый адрес(писать один раз!!!)
     dio.interceptors.add(InterceptorsWrapper(
       onError: (error, handler) async {
         if (error.response?.statusCode == 401) {

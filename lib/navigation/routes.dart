@@ -6,6 +6,9 @@ enum AppRoute {
   test('/test'),
   groupes('/homepage/groupes'),
   group('/homepage/groupes/group'),
+  room('/homepage/groupes/room'),
+  tasks('/homepage/groupes/room/tasks'),
+  task('/homepage/groupes/room/tasks/task'),
   userAdd('/homepage/groupes/group/user');
 
   const AppRoute(this.path);

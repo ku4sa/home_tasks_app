@@ -146,13 +146,14 @@ class __$$RoomImplCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$RoomImpl implements _Room {
-  const _$RoomImpl(
+class _$RoomImpl extends _Room {
+  _$RoomImpl(
       {required this.id,
       required this.describtion,
       required this.name,
       required this.dateUpdate,
-      required this.tasks});
+      required this.tasks})
+      : super._();
 
   factory _$RoomImpl.fromJson(Map<String, dynamic> json) =>
       _$$RoomImplFromJson(json);
@@ -206,13 +207,14 @@ class _$RoomImpl implements _Room {
   }
 }
 
-abstract class _Room implements Room {
-  const factory _Room(
+abstract class _Room extends Room {
+  factory _Room(
       {required final String? id,
       required final String? describtion,
       required final String name,
       required final DateTime dateUpdate,
       required final List<String> tasks}) = _$RoomImpl;
+  _Room._() : super._();
 
   factory _Room.fromJson(Map<String, dynamic> json) = _$RoomImpl.fromJson;
 

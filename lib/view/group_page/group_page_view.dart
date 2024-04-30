@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:home_tasks_app/navigation/routes.dart';
+import 'package:home_tasks_app/repositories/auth_repository.dart';
 import 'package:home_tasks_app/repositories/models/group_of_rooms/group_of_rooms.dart';
 import 'package:home_tasks_app/repositories/utils/validator.dart';
 import 'package:home_tasks_app/theme/theme.dart';
@@ -14,10 +15,8 @@ import 'group_page_state.dart';
 
 class GroupEditor extends StatefulWidget {
   final GroupOfRooms? group;
-  const GroupEditor({
-    super.key,
-    this.group,
-  });
+  final bool fullEdittingMode;
+  const GroupEditor({super.key, this.group, this.fullEdittingMode = true});
 
   @override
   State<GroupEditor> createState() => _GroupEditorState();
@@ -25,10 +24,13 @@ class GroupEditor extends StatefulWidget {
 
 class _GroupEditorState extends State<GroupEditor> {
   late final GroupEditorPageBloc bloc;
-  late String name;
-  late String describtion;
+  late TextEditingController nameController;
+  late TextEditingController describtionController;
   @override
   void initState() {
+    nameController = TextEditingController(text: widget.group?.name);
+    describtionController =
+        TextEditingController(text: widget.group?.describtion);
     bloc = GroupEditorPageBloc();
     (widget.group == null)
         ? bloc.add(CreatorOpened())
@@ -55,7 +57,7 @@ class _GroupEditorState extends State<GroupEditor> {
             onExit: () {
               context.pop(bloc.changeData.value);
             },
-            haveAddButton: true,
+            righttExitWithSave: true,
             onExitWithSave: () {
               context.pop(bloc.state.group);
             },
@@ -81,6 +83,17 @@ class _GroupEditorState extends State<GroupEditor> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: BlocBuilder<GroupEditorPageBloc,
+                            GroupEditorPageState>(
+                          builder: (context, state) => Text(
+                            'Создатель: ${state.group != null ? state.group!.author : ""}',
+                            style: AppTextStyles.nameForGroup
+                                .copyWith(color: AppColors.darkBlue),
+                          ),
+                        ),
+                      ),
                       if (widget.group == null)
                         ImportButton(
                           onTap: () async {
@@ -91,6 +104,13 @@ class _GroupEditorState extends State<GroupEditor> {
                               (value) {
                                 if (value != null && value is GroupOfRooms) {
                                   bloc.add(ImportSettings(group: value));
+                                  setState(() {
+                                    nameController.value =
+                                        TextEditingValue(text: value.name);
+                                    describtionController.value =
+                                        TextEditingValue(
+                                            text: value.describtion ?? '');
+                                  });
                                 }
                               },
                             );
@@ -107,14 +127,15 @@ class _GroupEditorState extends State<GroupEditor> {
                         height: 10,
                       ),
                       BlocBuilder<GroupEditorPageBloc, GroupEditorPageState>(
-                        builder: (context, state) => CustomTextField(
-                          initialValue: state.group?.name,
+                        builder: (context, state) => MyCustomTextField(
+                          controller: nameController,
+                          readOnly: !widget.fullEdittingMode,
                           label: '',
+                          validator: (p0) => Validator.validateName(p0),
                           hInt: '',
                           onChanged: (p0) {
                             bloc.add(ChangeName(name: p0));
                           },
-                          formzInput: state.name,
                         ),
                       ),
                       const SizedBox(
@@ -132,11 +153,14 @@ class _GroupEditorState extends State<GroupEditor> {
                         print('build');
                         return SizedBox(
                           height: 100,
-                          child: CustomTextField(
+                          child: MyCustomTextField(
+                            controller: describtionController,
+                            readOnly: !widget.fullEdittingMode,
                             maxLines: 3,
+                            validator: (p0) =>
+                                Validator.validateDescription(p0),
                             initialValue: state.group?.describtion,
                             label: '',
-                            formzInput: state.describtion,
                             hInt: '',
                             onChanged: (p0) {
                               bloc.add(ChangeDescribtion(describtion: p0));
@@ -152,20 +176,22 @@ class _GroupEditorState extends State<GroupEditor> {
                             alignment: Alignment.center,
                             child: LabelWithAdd(
                               label: 'Доступ к помещению :',
-                              onAdd: () async {
-                                final user = await showAdaptiveDialog(
-                                  context: context,
-                                  builder: (context) => const FindUser(),
-                                );
+                              onAdd: widget.fullEdittingMode
+                                  ? () async {
+                                      final user = await showAdaptiveDialog(
+                                        context: context,
+                                        builder: (context) => const FindUser(),
+                                      );
 
-                                if (user is String) {
-                                  bloc.add(
-                                    AddUser(
-                                      username: user,
-                                    ),
-                                  );
-                                }
-                              },
+                                      if (user is String) {
+                                        bloc.add(
+                                          AddUser(
+                                            username: user,
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  : null,
                             ),
                           ),
                         ),
@@ -183,13 +209,27 @@ class _GroupEditorState extends State<GroupEditor> {
                           horizontal: 25.0, vertical: 5),
                       child: ListItem(
                         label: state.group!.users[index],
-                        onTap: () {
-                          bloc.add(
-                            DeleteUser(
-                              username: state.group!.users[index],
-                            ),
-                          );
-                        },
+                        onTap: widget.fullEdittingMode
+                            ? () {
+                                bloc.add(
+                                  DeleteUser(
+                                    username: state.group!.users[index],
+                                  ),
+                                );
+                              }
+                            : state.group!.users[index] ==
+                                    GetIt.instance<AuthorizationRepository>()
+                                        .activeUser
+                                        .value!
+                                        .username
+                                ? () {
+                                    bloc.add(
+                                      DeleteUser(
+                                        username: state.group!.users[index],
+                                      ),
+                                    );
+                                  }
+                                : null,
                       ),
                     );
                   },
