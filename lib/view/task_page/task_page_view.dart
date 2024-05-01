@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
-import 'package:home_tasks_app/repositories/group_repository.dart';
 import 'package:home_tasks_app/repositories/models/task/task.dart';
 import 'package:home_tasks_app/repositories/models/task_type/task_type.dart';
 import 'package:home_tasks_app/repositories/utils/validator.dart';
@@ -36,16 +34,17 @@ class _TaskEditorState extends State<TaskEditor> {
   late TextEditingController nameController;
   late TextEditingController describtionController;
   late TextEditingController leadTimeController;
-  final users = GetIt.instance<GroupRepository>().getUsers();
+
   @override
   void initState() {
     nameController = TextEditingController(text: widget.task?.name);
     describtionController =
         TextEditingController(text: widget.task?.describtion);
     leadTimeController = TextEditingController(
-        text: widget.task?.leadTime != null
-            ? widget.task!.leadTime.toString()
-            : "0");
+      text: widget.task?.leadTime != null
+          ? widget.task!.leadTime.toString()
+          : "0",
+    );
     bloc = TaskEditorPageBloc();
     (widget.task == null)
         ? bloc.add(CreatorOpened())
@@ -54,6 +53,13 @@ class _TaskEditorState extends State<TaskEditor> {
           );
 
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    bloc.close();
+
+    super.dispose();
   }
 
   @override
@@ -150,7 +156,7 @@ class _TaskEditorState extends State<TaskEditor> {
                           },
                         ),
                       ),
-                      _textLabel("Описание задачи"),
+                      _textLabel("Описание задачи:"),
                       BlocBuilder<TaskEditorPageBloc, TaskEditorPageState>(
                         builder: (context, state) {
                           return SizedBox(
@@ -171,17 +177,15 @@ class _TaskEditorState extends State<TaskEditor> {
                           );
                         },
                       ),
-                      if (users != null && users!.isNotEmpty)
-                        _textLabel("Исполнитель"),
-                      if (users != null && users!.isNotEmpty)
+                      if (bloc.canChooseExecuter()) _textLabel("Исполнитель:"),
+                      if (bloc.canChooseExecuter())
                         SizedBox(
                           width: 400,
                           child: MyDropDownButton(
-                            content: users!,
+                            content: bloc.users!,
                             haveBorder: true,
-                            selectedValue: widget.task?.user != null
-                                ? User(username: widget.task!.user!)
-                                : null,
+                            selectedValue:
+                                bloc.selectedExecutor(widget.task?.user),
                             onChanged: (value) {
                               if (value is User) {
                                 bloc.add(ChangeActiveUser(user: value));
@@ -201,7 +205,9 @@ class _TaskEditorState extends State<TaskEditor> {
                         selectedValue: widget.task?.getStatus(),
                         onChanged: (value) {
                           if (value is Status) {
-                            bloc.add(ChangeStatus(status: value));
+                            bloc.add(
+                              ChangeStatus(status: value),
+                            );
                           }
                         },
                       ),
@@ -216,7 +222,9 @@ class _TaskEditorState extends State<TaskEditor> {
                         selectedValue: widget.task?.getType(),
                         onChanged: (value) {
                           if (value is TaskType) {
-                            bloc.add(ChangeTaskType(type: value));
+                            bloc.add(
+                              ChangeTaskType(type: value),
+                            );
                           }
                         },
                       ),
@@ -242,15 +250,19 @@ class _TaskEditorState extends State<TaskEditor> {
                           children: [
                             Expanded(
                               flex: 2,
-                              child: PriorityView(
-                                priority: widget.task?.priority,
-                                onChanged: (value) {
-                                  bloc.add(
-                                    ChangePriority(
-                                      priority: value,
-                                    ),
-                                  );
-                                },
+                              child: BlocBuilder<TaskEditorPageBloc,
+                                  TaskEditorPageState>(
+                                builder: (context, state) => PriorityView(
+                                  priority: widget.task?.priority ??
+                                      state.task?.priority,
+                                  onChanged: (value) {
+                                    bloc.add(
+                                      ChangePriority(
+                                        priority: value,
+                                      ),
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                             Expanded(

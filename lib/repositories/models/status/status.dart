@@ -14,9 +14,9 @@ class Status extends DataModel with _$Status {
   @override
   String getName() {
     switch (status) {
-      case 2:
-        return "Ожидает выполнения";
       case 1:
+        return "Ожидает выполнения";
+      case 2:
         return "Пропущена";
       case 3:
         return "Выполнена";

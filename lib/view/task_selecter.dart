@@ -66,6 +66,7 @@ class TaskSelecter extends StatelessWidget {
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
                             child: TaskView(
+                              isImportSettings: true,
                               data: item,
                               haveSettings: false,
                             ),

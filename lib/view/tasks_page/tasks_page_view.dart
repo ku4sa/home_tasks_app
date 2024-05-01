@@ -9,6 +9,7 @@ import 'package:home_tasks_app/view/tasks_page/tasks_page_bloc.dart';
 import 'package:home_tasks_app/view/tasks_page/tasks_page_events.dart';
 import '../../repositories/models/room/room.dart';
 import '../components/components.dart';
+import '../components/text_field.dart';
 import 'tasks_page_state.dart';
 
 class TasksPage extends StatelessWidget {
@@ -37,14 +38,16 @@ class TasksPage extends StatelessWidget {
             haveButtons: false,
             underTitle: SizedBox(
               height: 45,
-              child: CustomTextField(
-                label: '',
+              child: MyCustomTextField(
+                readOnly: false,
+                controller: TextEditingController(),
+                label: 'поиск',
                 text: 'поиск',
                 filledColor: AppColors.white,
-                formzInput: null,
-                hInt: 'search',
+                hInt: 'поиск',
                 suffixIcon: 'assets/icons/clear.svg',
                 onChanged: (p0) {
+                  print(p0);
                   bloc.add(SearchTask(value: p0));
                 },
               ),

@@ -32,6 +32,10 @@ class GroupUseCase {
     }
   }
 
+  List<User>? getUsersWithAuthor() {
+    return _groupRepository.getUsersWithAuthor();
+  }
+
   Future<void> init() async {
     await _groupRepository.init();
   }

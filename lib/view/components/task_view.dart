@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import "package:get_it/get_it.dart";
 
 import "package:home_tasks_app/repositories/models/task/task.dart";
+import "package:home_tasks_app/repositories/models/task_type/task_type.dart";
 import "package:home_tasks_app/use_cases/group_use_case.dart";
 import "package:home_tasks_app/view/components/components.dart";
 
@@ -15,19 +16,23 @@ class TaskView extends StatelessWidget {
     required this.data,
     this.onTapSettings,
     this.haveSettings = true,
+    this.isImportSettings = false,
   });
+  final bool isImportSettings;
   final bool haveSettings;
   final void Function(bool fullEditting)? onTapSettings;
   final Task data;
 
   @override
   Widget build(BuildContext context) {
-    final color = data.status == 2
-        ? AppColors.yellow
-        : data.status == 1
-            ? AppColors.green
-            : AppColors.red;
-    final users = GetIt.instance<GroupUseCase>().getUsers();
+    final color = isImportSettings
+        ? AppColors.lightBlue
+        : data.status == 2
+            ? AppColors.red
+            : data.status == 1
+                ? AppColors.yellow
+                : AppColors.green;
+    final users = GetIt.instance<GroupUseCase>().getUsersWithAuthor();
     return Container(
       height: 80,
       decoration: BoxDecoration(
@@ -67,7 +72,7 @@ class TaskView extends StatelessWidget {
                     alignment: Alignment.center,
                     child: SizedBox(
                         height: 30,
-                        child: users != null
+                        child: users != null && !isImportSettings
                             ? MyDropDownButton(
                                 content: users,
                                 selectedValue: data.user != null
@@ -76,19 +81,30 @@ class TaskView extends StatelessWidget {
                                 onChanged: (p0) {})
                             : const SizedBox()),
                   ),
-                  Align(
-                    alignment: users != null
-                        ? Alignment.bottomRight
-                        : Alignment.centerRight,
-                    child: Text(
-                      "${data.getStatus()?.getName()}",
-                      maxLines: 1,
-                      overflow: TextOverflow.clip,
-                      style: AppTextStyles.smallText.copyWith(
-                        color: color,
+                  
+                    Align(
+                      alignment: users != null
+                          ? Alignment.bottomRight
+                          : Alignment.centerRight,
+                      child: Padding(
+                        padding:isImportSettings? const EdgeInsets.all(8.0): EdgeInsets.zero,
+                        child: isImportSettings
+                            ? Text("${data.getType()?.getName()}",
+                                style: AppTextStyles.bigText.copyWith(
+                                  color: AppColors.disabled,
+                                ),)
+                            : Text(
+                                "${data.getStatus()?.getName()}",
+                                maxLines: 1,
+                                overflow: TextOverflow.clip,
+                                style: AppTextStyles.smallText.copyWith(
+                                  color: color,
+                                ),
+                              ),
                       ),
+
+
                     ),
-                  ),
 
                   //исполнитель и статус
                 ],

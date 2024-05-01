@@ -32,63 +32,65 @@ class MyAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      color: AppColors.lightBlue,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (canGoBack)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: IconButton(
-                onPressed: onExit,
-                icon: Icon(
-                  Icons.arrow_back,
-                  color: AppColors.white,
+    return SafeArea(
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        color: AppColors.lightBlue,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (canGoBack)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: IconButton(
+                  onPressed: onExit,
+                  icon: Icon(
+                    Icons.arrow_back,
+                    color: AppColors.white,
+                  ),
                 ),
               ),
-            ),
-          if (haveButtons)
+            if (haveButtons)
+              Expanded(
+                flex: 1,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      onPressed: onTapSettings,
+                      icon: SvgPicture.asset('assets/icons/settings_fill.svg'),
+                    ),
+                    IconButton(
+                        onPressed: onTapStatistic,
+                        icon: Icon(
+                          Icons.stacked_bar_chart,
+                          color: AppColors.white,
+                        ))
+                  ],
+                ),
+              ),
             Expanded(
-              flex: 1,
+              flex: 4,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  IconButton(
-                    onPressed: onTapSettings,
-                    icon: SvgPicture.asset('assets/icons/settings_fill.svg'),
+                  Text(
+                    title,
+                    style: style ?? AppTextStyles.headerStyle.copyWith(height: 1),
                   ),
-                  IconButton(
-                      onPressed: onTapStatistic,
-                      icon: Icon(
-                        Icons.stacked_bar_chart,
-                        color: AppColors.white,
-                      ))
+                  Padding(
+                    padding: const EdgeInsets.only(right: 20.0, top: 8),
+                    child: underTitle ?? const SizedBox(),
+                  ),
                 ],
               ),
             ),
-          Expanded(
-            flex: 4,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: style ?? AppTextStyles.headerStyle.copyWith(height: 1),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 20.0, top: 8),
-                  child: underTitle ?? const SizedBox(),
-                ),
-              ],
-            ),
-          ),
-          if (righttExitWithSave) _exitWithSave(),
-        ],
+            if (righttExitWithSave) _exitWithSave(),
+          ],
+        ),
       ),
     );
   }

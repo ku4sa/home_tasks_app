@@ -35,6 +35,19 @@ class GroupRepository {
     }
   }
 
+  List<User>? getUsersWithAuthor() {
+    final list = getUsers();
+    if (list == null) {
+      return null;
+    }
+
+    if (activeGroupOfRooms.value?.author != null) {
+      list.add(User(username: activeGroupOfRooms.value!.author));
+    }
+
+    return list;
+  }
+
   Future<void> init() async {
     _user = GetIt.instance<AuthorizationRepository>().activeUser.value;
     if (_user == null) throw Exception("User not authorized");

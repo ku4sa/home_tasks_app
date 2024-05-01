@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:home_tasks_app/use_cases/task_use_case.dart';
+import '../../repositories/auth_repository.dart';
+import '../../repositories/group_repository.dart';
 import '../../repositories/models/task/task.dart';
 import '../../repositories/models/task_type/task_type.dart';
+import '../../repositories/models/user/user.dart';
 import '../../repositories/utils/validator.dart';
 import 'task_page_events.dart';
 import 'task_page_state.dart';
@@ -32,8 +35,24 @@ class TaskEditorPageBloc extends Bloc<TaskEditorEvents, TaskEditorPageState> {
   final ValueNotifier<bool> changeData = ValueNotifier(false);
   final ValueNotifier<DateTime?> selectedDate = ValueNotifier(null);
   final ValueNotifier<TaskType?> selectedType = ValueNotifier(null);
+  final users = GetIt.instance<GroupRepository>().getUsersWithAuthor();
 
-  late TaskUseCase _taskUseCase;
+  bool canChooseExecuter() {
+    return users != null && users!.length > 1;
+  }
+
+  User? selectedExecutor(String? user) {
+    return user != null
+        ? users!.firstWhere((element) => element.username == user)
+        : users!.firstWhere(
+            (element) =>
+                element.username ==
+                GetIt.instance<AuthorizationRepository>()
+                    .activeUser
+                    .value!
+                    .username,
+          );
+  }
 
   FutureOr<void> _onEditorOpened(
       EditorOpened event, Emitter<TaskEditorPageState> emit) {
@@ -44,7 +63,7 @@ class TaskEditorPageBloc extends Bloc<TaskEditorEvents, TaskEditorPageState> {
       ),
     );
     selectedDate.value = event.task.date;
-    _taskUseCase = GetIt.instance<TaskUseCase>();
+    // _taskUseCase = GetIt.instance<TaskUseCase>();
   }
 
   FutureOr<void> _onCreatorOpened(
@@ -65,7 +84,7 @@ class TaskEditorPageBloc extends Bloc<TaskEditorEvents, TaskEditorPageState> {
         isValid: false,
       ),
     );
-    _taskUseCase = GetIt.instance<TaskUseCase>();
+    // _taskUseCase = GetIt.instance<TaskUseCase>();
   }
 
   FutureOr<void> _onChangeName(
@@ -75,7 +94,7 @@ class TaskEditorPageBloc extends Bloc<TaskEditorEvents, TaskEditorPageState> {
         task: state.task!.copyWith(name: event.name),
         isValid: Validator.validateName(event.name) == null &&
             Validator.validateDescription(state.task!.describtion) == null &&
-            state.task?.priority != 0 ,
+            state.task?.priority != 0,
       ),
     );
     changeData.value = true;

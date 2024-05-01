@@ -27,6 +27,7 @@ class HomePage extends StatelessWidget {
               title: 'Помещение:',
               haveButtons: true,
               underTitle: MyDropDownButton(
+                setDefault: state.groupes.isNotEmpty,
                 onChanged: (p0) {
                   if (p0 is GroupOfRooms) {
                     bloc.add(
