@@ -42,7 +42,7 @@ class _TaskEditorState extends State<TaskEditor> {
         TextEditingController(text: widget.task?.describtion);
     leadTimeController = TextEditingController(
       text: widget.task?.leadTime != null
-          ? widget.task!.leadTime.toString()
+          ? widget.task!.leadTime!.minutes.toString()
           : "0",
     );
     bloc = TaskEditorPageBloc();
@@ -133,7 +133,7 @@ class _TaskEditorState extends State<TaskEditor> {
                                       leadTimeController.value =
                                           TextEditingValue(
                                         text: value.leadTime != null
-                                            ? value.leadTime.toString()
+                                            ? value.leadTime!.minutes.toString()
                                             : "0",
                                       );
                                     },
@@ -236,7 +236,13 @@ class _TaskEditorState extends State<TaskEditor> {
                             case 1:
                               return _scrollDatePicker();
                             case 2:
-                              return _intervalChoiser();
+                              return _intervalChoiser(
+                                  initialValueForChoise: bloc.getTypeValue(),
+                                  initialValueForCount:
+                                      bloc.state.countValue != null &&
+                                              bloc.state.typeValue != null
+                                          ? bloc.state.countValue!
+                                          : null);
                             default:
                               return const SizedBox();
                           }
@@ -439,7 +445,9 @@ class _TaskEditorState extends State<TaskEditor> {
     );
   }
 
-  Widget _intervalChoiser() {
+  Widget _intervalChoiser(
+      {required int? initialValueForCount,
+      required int? initialValueForChoise}) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
@@ -461,14 +469,14 @@ class _TaskEditorState extends State<TaskEditor> {
                     print(value);
                   },
                   maxValue: 30,
-                  initValue: 3,
+                  initValue: initialValueForCount,
                   minValue: 1,
                 ),
                 widthBorder: 50),
             _choiser(
                 name: "Величина:",
                 wheelChoiser: WheelChooser.choices(
-                  startPosition: 0,
+                  startPosition: initialValueForChoise,
                   choices: [
                     WheelChoice(value: 1, title: "день"),
                     WheelChoice(value: 7, title: "неделя"),

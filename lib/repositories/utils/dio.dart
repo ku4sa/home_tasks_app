@@ -19,7 +19,7 @@ class MyDio {
         const Duration(seconds: 5); //таймаут на отправление
     dio.options.receiveTimeout =
         const Duration(seconds: 5); //таймаут на получение
-    dio.options.baseUrl = "https://192.168.0.103:7119/api/";
+    dio.options.baseUrl = "https://192.168.0.105:7119/api/";
     dio.interceptors.add(PrettyDioLogger(
       requestBody: true,
     )); //дефолтый адрес(писать один раз!!!)

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:home_tasks_app/use_cases/task_use_case.dart';
+import 'package:home_tasks_app/repositories/models/interval/interval.dart';
 import '../../repositories/auth_repository.dart';
 import '../../repositories/group_repository.dart';
 import '../../repositories/models/task/task.dart';
@@ -37,6 +37,21 @@ class TaskEditorPageBloc extends Bloc<TaskEditorEvents, TaskEditorPageState> {
   final ValueNotifier<TaskType?> selectedType = ValueNotifier(null);
   final users = GetIt.instance<GroupRepository>().getUsersWithAuthor();
 
+  int getTypeValue() {
+    switch (state.typeValue) {
+      case 1:
+        return 0;
+      case 7:
+        return 1;
+      case 30:
+        return 2;
+      case 365:
+        return 3;
+      default:
+        return 0;
+    }
+  }
+
   bool canChooseExecuter() {
     return users != null && users!.length > 1;
   }
@@ -56,13 +71,23 @@ class TaskEditorPageBloc extends Bloc<TaskEditorEvents, TaskEditorPageState> {
 
   FutureOr<void> _onEditorOpened(
       EditorOpened event, Emitter<TaskEditorPageState> emit) {
-    emit(
-      state.copyWith(
-        task: event.task,
-        isValid: true,
-      ),
-    );
     selectedDate.value = event.task.date;
+
+    selectedType.value = TaskType(type: event.task.type);
+
+    if (event.task.type == 2) {
+      final interval = event.task.getIntervalView();
+      if (interval != null)
+        emit(
+          state.copyWith(
+            task: event.task,
+            isValid: true,
+            typeValue: interval.keys.first,
+            countValue: interval.values.first,
+          ),
+        );
+    }
+
     // _taskUseCase = GetIt.instance<TaskUseCase>();
   }
 
@@ -82,8 +107,11 @@ class TaskEditorPageBloc extends Bloc<TaskEditorEvents, TaskEditorPageState> {
       state.copyWith(
         task: task,
         isValid: false,
+        typeValue: 1,
       ),
     );
+
+    selectedType.value = TaskType(type: 1);
     // _taskUseCase = GetIt.instance<TaskUseCase>();
   }
 
@@ -135,8 +163,17 @@ class TaskEditorPageBloc extends Bloc<TaskEditorEvents, TaskEditorPageState> {
 
     emit(
       state.copyWith(
-        task: state.task!.copyWith(leadTime: value),
-        isValid: Validator.validateName(state.task!.name) == null &&
+        task: state.task!.copyWith(
+          leadTime: value != null
+              ? IntervalType(
+                  minutes: value,
+                )
+              : null,
+        ),
+        isValid: Validator.validateName(
+                  state.task!.name,
+                ) ==
+                null &&
             Validator.validateDescription(state.task!.describtion) == null &&
             value != null,
       ),
@@ -158,12 +195,19 @@ class TaskEditorPageBloc extends Bloc<TaskEditorEvents, TaskEditorPageState> {
   FutureOr<void> _onChangeDate(
       ChangeDate event, Emitter<TaskEditorPageState> emit) {
     selectedDate.value = event.time;
-    //emit(state.copyWith(task: state.task!.copyWith(date: event.time)));
+    emit(
+      state.copyWith(
+        task: state.task!.copyWith(
+          date: event.time,
+        ),
+      ),
+    );
   }
 
   FutureOr<void> _onChangeTaskType(
       ChangeTaskType event, Emitter<TaskEditorPageState> emit) {
     selectedType.value = event.type;
+
     emit(
       state.copyWith(
         task: state.task?.copyWith(
@@ -188,13 +232,30 @@ class TaskEditorPageBloc extends Bloc<TaskEditorEvents, TaskEditorPageState> {
 
   FutureOr<void> _onChangeInterval(
       ChangeInterval event, Emitter<TaskEditorPageState> emit) {
-    if (event.interval != null) {
-      emit(
-        state.copyWith(
-          task: state.task?.copyWith(leadTime: event.interval),
-        ),
-      ); //TODO ДОДЕЛАТЬ ИНТЕРВАЛЫ
+    IntervalType? duration = state.task!.interval;
+    emit(
+      state.copyWith(
+        typeValue: event.type ?? state.typeValue,
+        countValue: event.interval ?? state.countValue,
+      ),
+    );
+    if (state.typeValue != null && state.countValue != null) {
+      duration = IntervalType(
+        days: state.countValue! * state.typeValue!,
+      );
     }
+    print(duration);
+
+    emit(
+      state.copyWith(
+        task: state.task!.copyWith(
+          interval: duration,
+          date: duration != null //пересчитываем следующую дату выполнения
+              ? DateTime.now().add(duration.toDuration())
+              : state.task!.date,
+        ),
+      ),
+    );
   }
 
   FutureOr<void> _onChangePriority(

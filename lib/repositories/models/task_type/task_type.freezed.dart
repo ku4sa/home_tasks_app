@@ -14,15 +14,10 @@ T _$identity<T>(T value) => value;
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
-TaskType _$TaskTypeFromJson(Map<String, dynamic> json) {
-  return _TaskType.fromJson(json);
-}
-
 /// @nodoc
 mixin _$TaskType {
   int get type => throw _privateConstructorUsedError;
 
-  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
   $TaskTypeCopyWith<TaskType> get copyWith =>
       throw _privateConstructorUsedError;
@@ -94,12 +89,9 @@ class __$$TaskTypeImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-@JsonSerializable()
+
 class _$TaskTypeImpl extends _TaskType {
   _$TaskTypeImpl({required this.type}) : super._();
-
-  factory _$TaskTypeImpl.fromJson(Map<String, dynamic> json) =>
-      _$$TaskTypeImplFromJson(json);
 
   @override
   final int type;
@@ -117,7 +109,6 @@ class _$TaskTypeImpl extends _TaskType {
             (identical(other.type, type) || other.type == type));
   }
 
-  @JsonKey(ignore: true)
   @override
   int get hashCode => Object.hash(runtimeType, type);
 
@@ -126,21 +117,11 @@ class _$TaskTypeImpl extends _TaskType {
   @pragma('vm:prefer-inline')
   _$$TaskTypeImplCopyWith<_$TaskTypeImpl> get copyWith =>
       __$$TaskTypeImplCopyWithImpl<_$TaskTypeImpl>(this, _$identity);
-
-  @override
-  Map<String, dynamic> toJson() {
-    return _$$TaskTypeImplToJson(
-      this,
-    );
-  }
 }
 
 abstract class _TaskType extends TaskType {
   factory _TaskType({required final int type}) = _$TaskTypeImpl;
   _TaskType._() : super._();
-
-  factory _TaskType.fromJson(Map<String, dynamic> json) =
-      _$TaskTypeImpl.fromJson;
 
   @override
   int get type;

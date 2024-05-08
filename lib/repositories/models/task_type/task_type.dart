@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../data_model.dart';
 part 'task_type.freezed.dart';
-part 'task_type.g.dart';
 
 @Freezed()
 class TaskType extends DataModel with _$TaskType {

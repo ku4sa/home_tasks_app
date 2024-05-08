@@ -103,6 +103,7 @@ class _MyCustomTextFieldState extends State<MyCustomTextField> {
       onChanged: (value) {
         changeValue(value);
       },
+      
       decoration: InputDecoration(
         fillColor: widget.filledColor,
         filled: widget.filledColor != null,
@@ -110,6 +111,7 @@ class _MyCustomTextFieldState extends State<MyCustomTextField> {
         errorMaxLines: 3,
         helperMaxLines: 3,
         hintText: widget.text,
+     
         labelText: widget.label,
         labelStyle: AppTextStyles.smallText,
         prefixIcon: widget.icon != null

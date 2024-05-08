@@ -28,9 +28,8 @@ mixin _$Task {
   int get priority => throw _privateConstructorUsedError;
   String? get user => throw _privateConstructorUsedError;
   DateTime get date => throw _privateConstructorUsedError;
-  int? get daysInterval => throw _privateConstructorUsedError;
-  @JsonKey(name: 'minutes')
-  int? get leadTime => throw _privateConstructorUsedError;
+  IntervalType? get interval => throw _privateConstructorUsedError;
+  IntervalType? get leadTime => throw _privateConstructorUsedError;
   int get countRepeats => throw _privateConstructorUsedError;
   int get countSkips => throw _privateConstructorUsedError;
   DateTime get dateUpdate => throw _privateConstructorUsedError;
@@ -54,11 +53,14 @@ abstract class $TaskCopyWith<$Res> {
       int priority,
       String? user,
       DateTime date,
-      int? daysInterval,
-      @JsonKey(name: 'minutes') int? leadTime,
+      IntervalType? interval,
+      IntervalType? leadTime,
       int countRepeats,
       int countSkips,
       DateTime dateUpdate});
+
+  $IntervalTypeCopyWith<$Res>? get interval;
+  $IntervalTypeCopyWith<$Res>? get leadTime;
 }
 
 /// @nodoc
@@ -82,7 +84,7 @@ class _$TaskCopyWithImpl<$Res, $Val extends Task>
     Object? priority = null,
     Object? user = freezed,
     Object? date = null,
-    Object? daysInterval = freezed,
+    Object? interval = freezed,
     Object? leadTime = freezed,
     Object? countRepeats = null,
     Object? countSkips = null,
@@ -121,14 +123,14 @@ class _$TaskCopyWithImpl<$Res, $Val extends Task>
           ? _value.date
           : date // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      daysInterval: freezed == daysInterval
-          ? _value.daysInterval
-          : daysInterval // ignore: cast_nullable_to_non_nullable
-              as int?,
+      interval: freezed == interval
+          ? _value.interval
+          : interval // ignore: cast_nullable_to_non_nullable
+              as IntervalType?,
       leadTime: freezed == leadTime
           ? _value.leadTime
           : leadTime // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as IntervalType?,
       countRepeats: null == countRepeats
           ? _value.countRepeats
           : countRepeats // ignore: cast_nullable_to_non_nullable
@@ -142,6 +144,30 @@ class _$TaskCopyWithImpl<$Res, $Val extends Task>
           : dateUpdate // ignore: cast_nullable_to_non_nullable
               as DateTime,
     ) as $Val);
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $IntervalTypeCopyWith<$Res>? get interval {
+    if (_value.interval == null) {
+      return null;
+    }
+
+    return $IntervalTypeCopyWith<$Res>(_value.interval!, (value) {
+      return _then(_value.copyWith(interval: value) as $Val);
+    });
+  }
+
+  @override
+  @pragma('vm:prefer-inline')
+  $IntervalTypeCopyWith<$Res>? get leadTime {
+    if (_value.leadTime == null) {
+      return null;
+    }
+
+    return $IntervalTypeCopyWith<$Res>(_value.leadTime!, (value) {
+      return _then(_value.copyWith(leadTime: value) as $Val);
+    });
   }
 }
 
@@ -161,11 +187,16 @@ abstract class _$$TaskImplCopyWith<$Res> implements $TaskCopyWith<$Res> {
       int priority,
       String? user,
       DateTime date,
-      int? daysInterval,
-      @JsonKey(name: 'minutes') int? leadTime,
+      IntervalType? interval,
+      IntervalType? leadTime,
       int countRepeats,
       int countSkips,
       DateTime dateUpdate});
+
+  @override
+  $IntervalTypeCopyWith<$Res>? get interval;
+  @override
+  $IntervalTypeCopyWith<$Res>? get leadTime;
 }
 
 /// @nodoc
@@ -186,7 +217,7 @@ class __$$TaskImplCopyWithImpl<$Res>
     Object? priority = null,
     Object? user = freezed,
     Object? date = null,
-    Object? daysInterval = freezed,
+    Object? interval = freezed,
     Object? leadTime = freezed,
     Object? countRepeats = null,
     Object? countSkips = null,
@@ -225,14 +256,14 @@ class __$$TaskImplCopyWithImpl<$Res>
           ? _value.date
           : date // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      daysInterval: freezed == daysInterval
-          ? _value.daysInterval
-          : daysInterval // ignore: cast_nullable_to_non_nullable
-              as int?,
+      interval: freezed == interval
+          ? _value.interval
+          : interval // ignore: cast_nullable_to_non_nullable
+              as IntervalType?,
       leadTime: freezed == leadTime
           ? _value.leadTime
           : leadTime // ignore: cast_nullable_to_non_nullable
-              as int?,
+              as IntervalType?,
       countRepeats: null == countRepeats
           ? _value.countRepeats
           : countRepeats // ignore: cast_nullable_to_non_nullable
@@ -261,8 +292,8 @@ class _$TaskImpl extends _Task {
       required this.priority,
       this.user,
       required this.date,
-      this.daysInterval,
-      @JsonKey(name: 'minutes') this.leadTime,
+      this.interval,
+      this.leadTime,
       required this.countRepeats,
       required this.countSkips,
       required this.dateUpdate})
@@ -288,10 +319,9 @@ class _$TaskImpl extends _Task {
   @override
   final DateTime date;
   @override
-  final int? daysInterval;
+  final IntervalType? interval;
   @override
-  @JsonKey(name: 'minutes')
-  final int? leadTime;
+  final IntervalType? leadTime;
   @override
   final int countRepeats;
   @override
@@ -301,7 +331,7 @@ class _$TaskImpl extends _Task {
 
   @override
   String toString() {
-    return 'Task(id: $id, describtion: $describtion, name: $name, type: $type, status: $status, priority: $priority, user: $user, date: $date, daysInterval: $daysInterval, leadTime: $leadTime, countRepeats: $countRepeats, countSkips: $countSkips, dateUpdate: $dateUpdate)';
+    return 'Task(id: $id, describtion: $describtion, name: $name, type: $type, status: $status, priority: $priority, user: $user, date: $date, interval: $interval, leadTime: $leadTime, countRepeats: $countRepeats, countSkips: $countSkips, dateUpdate: $dateUpdate)';
   }
 
   @override
@@ -319,8 +349,8 @@ class _$TaskImpl extends _Task {
                 other.priority == priority) &&
             (identical(other.user, user) || other.user == user) &&
             (identical(other.date, date) || other.date == date) &&
-            (identical(other.daysInterval, daysInterval) ||
-                other.daysInterval == daysInterval) &&
+            (identical(other.interval, interval) ||
+                other.interval == interval) &&
             (identical(other.leadTime, leadTime) ||
                 other.leadTime == leadTime) &&
             (identical(other.countRepeats, countRepeats) ||
@@ -343,7 +373,7 @@ class _$TaskImpl extends _Task {
       priority,
       user,
       date,
-      daysInterval,
+      interval,
       leadTime,
       countRepeats,
       countSkips,
@@ -373,8 +403,8 @@ abstract class _Task extends Task {
       required final int priority,
       final String? user,
       required final DateTime date,
-      final int? daysInterval,
-      @JsonKey(name: 'minutes') final int? leadTime,
+      final IntervalType? interval,
+      final IntervalType? leadTime,
       required final int countRepeats,
       required final int countSkips,
       required final DateTime dateUpdate}) = _$TaskImpl;
@@ -399,10 +429,9 @@ abstract class _Task extends Task {
   @override
   DateTime get date;
   @override
-  int? get daysInterval;
+  IntervalType? get interval;
   @override
-  @JsonKey(name: 'minutes')
-  int? get leadTime;
+  IntervalType? get leadTime;
   @override
   int get countRepeats;
   @override

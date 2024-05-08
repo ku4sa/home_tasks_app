@@ -2,7 +2,6 @@ import "package:flutter/material.dart";
 import "package:get_it/get_it.dart";
 
 import "package:home_tasks_app/repositories/models/task/task.dart";
-import "package:home_tasks_app/repositories/models/task_type/task_type.dart";
 import "package:home_tasks_app/use_cases/group_use_case.dart";
 import "package:home_tasks_app/view/components/components.dart";
 
@@ -61,6 +60,12 @@ class TaskView extends StatelessWidget {
                       style: AppTextStyles.bigText,
                     ),
                   ),
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Text(
+                      data.getDaysToNeedToDo() ?? '', style: AppTextStyles.smallText,
+                    ),
+                  )
                 ],
               ),
             ),
@@ -81,30 +86,32 @@ class TaskView extends StatelessWidget {
                                 onChanged: (p0) {})
                             : const SizedBox()),
                   ),
-                  
-                    Align(
-                      alignment: users != null
-                          ? Alignment.bottomRight
-                          : Alignment.centerRight,
-                      child: Padding(
-                        padding:isImportSettings? const EdgeInsets.all(8.0): EdgeInsets.zero,
-                        child: isImportSettings
-                            ? Text("${data.getType()?.getName()}",
-                                style: AppTextStyles.bigText.copyWith(
-                                  color: AppColors.disabled,
-                                ),)
-                            : Text(
-                                "${data.getStatus()?.getName()}",
-                                maxLines: 1,
-                                overflow: TextOverflow.clip,
-                                style: AppTextStyles.smallText.copyWith(
-                                  color: color,
-                                ),
+
+                  Align(
+                    alignment: users != null
+                        ? Alignment.bottomRight
+                        : Alignment.centerRight,
+                    child: Padding(
+                      padding: isImportSettings
+                          ? const EdgeInsets.all(8.0)
+                          : EdgeInsets.zero,
+                      child: isImportSettings
+                          ? Text(
+                              "${data.getType()?.getName()}",
+                              style: AppTextStyles.bigText.copyWith(
+                                color: AppColors.disabled,
                               ),
-                      ),
-
-
+                            )
+                          : Text(
+                              "${data.getStatus()?.getName()}",
+                              maxLines: 1,
+                              overflow: TextOverflow.clip,
+                              style: AppTextStyles.smallText.copyWith(
+                                color: color,
+                              ),
+                            ),
                     ),
+                  ),
 
                   //исполнитель и статус
                 ],

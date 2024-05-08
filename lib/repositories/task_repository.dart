@@ -47,11 +47,12 @@ class TaskRepository {
     Response? response;
     try {
       response = await _dio.dio.put(
-        'tasks',
+        options: Options(headers: {"Content-Type": "application/json"}),
+        '/tasks',
         queryParameters: {
           "roomId": roomId,
-          "task": task,
         },
+        data: task.copyWith(dateUpdate: DateTime.now()).toJson(),
       );
       if (response.statusCode != 200) {
         var result = response.data as String;
